@@ -1,0 +1,2490 @@
+Grammar
+
+    0 $accept: program $end
+
+    1 $@1: /* empty */
+
+    2 program: PROGRAM ID SEMICOLON type_definitions variable_declarations $@1 subprogram_declarations compound_statement DOT
+
+    3 type_definitions: /* empty */
+    4                 | TYPE type_definition_list
+
+    5 type_definition_list: type_definition_list type_definition SEMICOLON
+    6                     | type_definition SEMICOLON
+
+    7 variable_declarations: /* empty */
+    8                      | VAR variable_declaration_list
+
+    9 variable_declaration_list: variable_declaration_list identifier_list COLON type SEMICOLON
+   10                          | identifier_list COLON type SEMICOLON
+
+   11 subprogram_declarations: /* empty */
+   12                        | procedure_declaration SEMICOLON subprogram_declarations
+   13                        | function_declaration SEMICOLON subprogram_declarations
+
+   14 type_definition: ID EQ type
+
+   15 $@2: /* empty */
+
+   16 $@3: /* empty */
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON $@3 declaration_body
+
+   18 $@4: /* empty */
+
+   19 $@5: /* empty */
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body
+
+   21 declaration_body: block
+   22                 | FORWARD
+
+   23 formal_parameter_list: /* empty */
+   24                      | formal_parameter_list_section
+
+   25 formal_parameter_list_section: formal_parameter_list_section SEMICOLON identifier_list COLON type
+   26                              | identifier_list COLON type
+
+   27 $@6: /* empty */
+
+   28 block: variable_declarations $@6 compound_statement
+
+   29 compound_statement: PBEGIN statement_sequence END
+
+   30 statement_sequence: statement_sequence SEMICOLON statement
+   31                   | statement
+
+   32 statement: open_statement
+   33          | closed_statement
+
+   34 open_statement: open_if_statement
+   35               | open_while_statement
+   36               | open_for_statement
+
+   37 closed_statement: /* empty */
+   38                 | assignment_statement
+   39                 | procedure_statement
+   40                 | compound_statement
+   41                 | closed_if_statement
+   42                 | closed_while_statement
+   43                 | closed_for_statement
+
+   44 open_if_statement: IF expression THEN statement
+   45                  | IF expression THEN closed_statement ELSE open_statement
+
+   46 closed_if_statement: IF expression THEN closed_statement ELSE closed_statement
+
+   47 open_while_statement: WHILE expression DO open_statement
+
+   48 closed_while_statement: WHILE expression DO closed_statement
+
+   49 open_for_statement: FOR ID ASSIGNOP expression TO expression DO open_statement
+
+   50 closed_for_statement: FOR ID ASSIGNOP expression TO expression DO closed_statement
+
+   51 assignment_statement: variable ASSIGNOP expression
+
+   52 procedure_statement: ID LPARENTHESIS actual_parameter_list RPARENTHESIS
+
+   53 type: ID
+   54     | ARRAY LBRACKET constant DOTDOT constant RBRACKET OF type
+   55     | RECORD field_list END
+
+   56 result_type: ID
+
+   57 field_list: /* empty */
+   58           | field_list_section
+
+   59 field_list_section: field_list_section SEMICOLON identifier_list COLON type
+   60                   | identifier_list COLON type
+
+   61 constant: NUMBER
+   62         | PLUS NUMBER
+   63         | MINUS NUMBER
+
+   64 expression: simple_expression
+   65           | simple_expression LT simple_expression
+   66           | simple_expression LE simple_expression
+   67           | simple_expression EQ simple_expression
+   68           | simple_expression GE simple_expression
+   69           | simple_expression GT simple_expression
+   70           | simple_expression NE simple_expression
+
+   71 simple_expression: simple_expression_list
+   72                  | PLUS simple_expression_list
+   73                  | MINUS simple_expression_list
+
+   74 simple_expression_list: term
+   75                       | simple_expression_list PLUS term
+   76                       | simple_expression_list MINUS term
+   77                       | simple_expression_list OR term
+
+   78 term: factor
+   79     | term MULTI factor
+   80     | term DIV factor
+   81     | term DIVIS factor
+   82     | term MOD factor
+   83     | term AND factor
+
+   84 factor: NUMBER
+   85       | STRING
+   86       | variable
+   87       | function_reference
+   88       | NOT factor
+   89       | LPARENTHESIS expression RPARENTHESIS
+
+   90 function_reference: ID LPARENTHESIS actual_parameter_list RPARENTHESIS
+
+   91 variable: ID component_selection
+
+   92 component_selection: /* empty */
+   93                    | DOT ID component_selection
+
+   94 $@7: /* empty */
+
+   95 component_selection: LBRACKET expression RBRACKET $@7 component_selection
+
+   96 actual_parameter_list: /* empty */
+   97                      | actual_parameter_list_section
+
+   98 actual_parameter_list_section: actual_parameter_list_section COMMA expression
+   99                              | expression
+
+  100 identifier_list: identifier_list COMMA ID
+  101                | ID
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+AND (258) 83
+PBEGIN (259) 29
+FORWARD (260) 22
+DIV (261) 80
+DO (262) 47 48 49 50
+ELSE (263) 45 46
+END (264) 29 55
+FOR (265) 49 50
+FUNCTION (266) 20
+IF (267) 44 45 46
+ARRAY (268) 54
+MOD (269) 82
+NOT (270) 88
+OF (271) 54
+OR (272) 77
+PROCEDURE (273) 17
+PROGRAM (274) 2
+RECORD (275) 55
+THEN (276) 44 45 46
+TO (277) 49 50
+TYPE (278) 4
+VAR (279) 8
+WHILE (280) 47 48
+NUMBER (281) 61 62 63 84
+STRING (282) 85
+ID (283) 2 14 17 20 49 50 52 53 56 90 91 93 100 101
+PLUS (284) 62 72 75
+MINUS (285) 63 73 76
+MULTI (286) 79
+DIVIS (287) 81
+ASSIGNOP (288) 49 50 51
+LT (289) 65
+EQ (290) 14 67
+GT (291) 69
+LE (292) 66
+GE (293) 68
+NE (294) 70
+LPARENTHESIS (295) 17 20 52 89 90
+RPARENTHESIS (296) 17 20 52 89 90
+LBRACKET (297) 54 95
+RBRACKET (298) 54 95
+DOT (299) 2 93
+COMMA (300) 98 100
+COLON (301) 9 10 20 25 26 59 60
+SEMICOLON (302) 2 5 6 9 10 12 13 17 20 25 30 59
+DOTDOT (303) 54
+NEG (304)
+POS (305)
+
+
+Nonterminals, with rules where they appear
+
+$accept (51)
+    on left: 0
+program (52)
+    on left: 2, on right: 0
+$@1 (53)
+    on left: 1, on right: 2
+type_definitions (54)
+    on left: 3 4, on right: 2
+type_definition_list (55)
+    on left: 5 6, on right: 4 5
+variable_declarations (56)
+    on left: 7 8, on right: 2 28
+variable_declaration_list (57)
+    on left: 9 10, on right: 8 9
+subprogram_declarations (58)
+    on left: 11 12 13, on right: 2 12 13
+type_definition (59)
+    on left: 14, on right: 5 6
+procedure_declaration (60)
+    on left: 17, on right: 12
+$@2 (61)
+    on left: 15, on right: 17
+$@3 (62)
+    on left: 16, on right: 17
+function_declaration (63)
+    on left: 20, on right: 13
+$@4 (64)
+    on left: 18, on right: 20
+$@5 (65)
+    on left: 19, on right: 20
+declaration_body (66)
+    on left: 21 22, on right: 17 20
+formal_parameter_list (67)
+    on left: 23 24, on right: 17 20
+formal_parameter_list_section (68)
+    on left: 25 26, on right: 24 25
+block (69)
+    on left: 28, on right: 21
+$@6 (70)
+    on left: 27, on right: 28
+compound_statement (71)
+    on left: 29, on right: 2 28 40
+statement_sequence (72)
+    on left: 30 31, on right: 29 30
+statement (73)
+    on left: 32 33, on right: 30 31 44
+open_statement (74)
+    on left: 34 35 36, on right: 32 45 47 49
+closed_statement (75)
+    on left: 37 38 39 40 41 42 43, on right: 33 45 46 48 50
+open_if_statement (76)
+    on left: 44 45, on right: 34
+closed_if_statement (77)
+    on left: 46, on right: 41
+open_while_statement (78)
+    on left: 47, on right: 35
+closed_while_statement (79)
+    on left: 48, on right: 42
+open_for_statement (80)
+    on left: 49, on right: 36
+closed_for_statement (81)
+    on left: 50, on right: 43
+assignment_statement (82)
+    on left: 51, on right: 38
+procedure_statement (83)
+    on left: 52, on right: 39
+type (84)
+    on left: 53 54 55, on right: 9 10 14 25 26 54 59 60
+result_type (85)
+    on left: 56, on right: 20
+field_list (86)
+    on left: 57 58, on right: 55
+field_list_section (87)
+    on left: 59 60, on right: 58 59
+constant (88)
+    on left: 61 62 63, on right: 54
+expression (89)
+    on left: 64 65 66 67 68 69 70, on right: 44 45 46 47 48 49 50 51
+    89 95 98 99
+simple_expression (90)
+    on left: 71 72 73, on right: 64 65 66 67 68 69 70
+simple_expression_list (91)
+    on left: 74 75 76 77, on right: 71 72 73 75 76 77
+term (92)
+    on left: 78 79 80 81 82 83, on right: 74 75 76 77 79 80 81 82 83
+factor (93)
+    on left: 84 85 86 87 88 89, on right: 78 79 80 81 82 83 88
+function_reference (94)
+    on left: 90, on right: 87
+variable (95)
+    on left: 91, on right: 51 86
+component_selection (96)
+    on left: 92 93 95, on right: 91 93 95
+$@7 (97)
+    on left: 94, on right: 95
+actual_parameter_list (98)
+    on left: 96 97, on right: 52 90
+actual_parameter_list_section (99)
+    on left: 98 99, on right: 97 98
+identifier_list (100)
+    on left: 100 101, on right: 9 10 25 26 59 60 100
+
+
+state 0
+
+    0 $accept: . program $end
+
+    PROGRAM  shift, and go to state 1
+
+    program  go to state 2
+
+
+state 1
+
+    2 program: PROGRAM . ID SEMICOLON type_definitions variable_declarations $@1 subprogram_declarations compound_statement DOT
+
+    ID  shift, and go to state 3
+
+
+state 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 4
+
+
+state 3
+
+    2 program: PROGRAM ID . SEMICOLON type_definitions variable_declarations $@1 subprogram_declarations compound_statement DOT
+
+    SEMICOLON  shift, and go to state 5
+
+
+state 4
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 5
+
+    2 program: PROGRAM ID SEMICOLON . type_definitions variable_declarations $@1 subprogram_declarations compound_statement DOT
+
+    TYPE  shift, and go to state 6
+
+    $default  reduce using rule 3 (type_definitions)
+
+    type_definitions  go to state 7
+
+
+state 6
+
+    4 type_definitions: TYPE . type_definition_list
+
+    ID  shift, and go to state 8
+
+    type_definition_list  go to state 9
+    type_definition       go to state 10
+
+
+state 7
+
+    2 program: PROGRAM ID SEMICOLON type_definitions . variable_declarations $@1 subprogram_declarations compound_statement DOT
+
+    VAR  shift, and go to state 11
+
+    $default  reduce using rule 7 (variable_declarations)
+
+    variable_declarations  go to state 12
+
+
+state 8
+
+   14 type_definition: ID . EQ type
+
+    EQ  shift, and go to state 13
+
+
+state 9
+
+    4 type_definitions: TYPE type_definition_list .
+    5 type_definition_list: type_definition_list . type_definition SEMICOLON
+
+    ID  shift, and go to state 8
+
+    $default  reduce using rule 4 (type_definitions)
+
+    type_definition  go to state 14
+
+
+state 10
+
+    6 type_definition_list: type_definition . SEMICOLON
+
+    SEMICOLON  shift, and go to state 15
+
+
+state 11
+
+    8 variable_declarations: VAR . variable_declaration_list
+
+    ID  shift, and go to state 16
+
+    variable_declaration_list  go to state 17
+    identifier_list            go to state 18
+
+
+state 12
+
+    2 program: PROGRAM ID SEMICOLON type_definitions variable_declarations . $@1 subprogram_declarations compound_statement DOT
+
+    $default  reduce using rule 1 ($@1)
+
+    $@1  go to state 19
+
+
+state 13
+
+   14 type_definition: ID EQ . type
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 23
+
+
+state 14
+
+    5 type_definition_list: type_definition_list type_definition . SEMICOLON
+
+    SEMICOLON  shift, and go to state 24
+
+
+state 15
+
+    6 type_definition_list: type_definition SEMICOLON .
+
+    $default  reduce using rule 6 (type_definition_list)
+
+
+state 16
+
+  101 identifier_list: ID .
+
+    $default  reduce using rule 101 (identifier_list)
+
+
+state 17
+
+    8 variable_declarations: VAR variable_declaration_list .
+    9 variable_declaration_list: variable_declaration_list . identifier_list COLON type SEMICOLON
+
+    ID  shift, and go to state 16
+
+    $default  reduce using rule 8 (variable_declarations)
+
+    identifier_list  go to state 25
+
+
+state 18
+
+   10 variable_declaration_list: identifier_list . COLON type SEMICOLON
+  100 identifier_list: identifier_list . COMMA ID
+
+    COMMA  shift, and go to state 26
+    COLON  shift, and go to state 27
+
+
+state 19
+
+    2 program: PROGRAM ID SEMICOLON type_definitions variable_declarations $@1 . subprogram_declarations compound_statement DOT
+
+    FUNCTION   shift, and go to state 28
+    PROCEDURE  shift, and go to state 29
+
+    $default  reduce using rule 11 (subprogram_declarations)
+
+    subprogram_declarations  go to state 30
+    procedure_declaration    go to state 31
+    function_declaration     go to state 32
+
+
+state 20
+
+   54 type: ARRAY . LBRACKET constant DOTDOT constant RBRACKET OF type
+
+    LBRACKET  shift, and go to state 33
+
+
+state 21
+
+   55 type: RECORD . field_list END
+
+    ID  shift, and go to state 16
+
+    $default  reduce using rule 57 (field_list)
+
+    field_list          go to state 34
+    field_list_section  go to state 35
+    identifier_list     go to state 36
+
+
+state 22
+
+   53 type: ID .
+
+    $default  reduce using rule 53 (type)
+
+
+state 23
+
+   14 type_definition: ID EQ type .
+
+    $default  reduce using rule 14 (type_definition)
+
+
+state 24
+
+    5 type_definition_list: type_definition_list type_definition SEMICOLON .
+
+    $default  reduce using rule 5 (type_definition_list)
+
+
+state 25
+
+    9 variable_declaration_list: variable_declaration_list identifier_list . COLON type SEMICOLON
+  100 identifier_list: identifier_list . COMMA ID
+
+    COMMA  shift, and go to state 26
+    COLON  shift, and go to state 37
+
+
+state 26
+
+  100 identifier_list: identifier_list COMMA . ID
+
+    ID  shift, and go to state 38
+
+
+state 27
+
+   10 variable_declaration_list: identifier_list COLON . type SEMICOLON
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 39
+
+
+state 28
+
+   20 function_declaration: FUNCTION . ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body
+
+    ID  shift, and go to state 40
+
+
+state 29
+
+   17 procedure_declaration: PROCEDURE . ID $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON $@3 declaration_body
+
+    ID  shift, and go to state 41
+
+
+state 30
+
+    2 program: PROGRAM ID SEMICOLON type_definitions variable_declarations $@1 subprogram_declarations . compound_statement DOT
+
+    PBEGIN  shift, and go to state 42
+
+    compound_statement  go to state 43
+
+
+state 31
+
+   12 subprogram_declarations: procedure_declaration . SEMICOLON subprogram_declarations
+
+    SEMICOLON  shift, and go to state 44
+
+
+state 32
+
+   13 subprogram_declarations: function_declaration . SEMICOLON subprogram_declarations
+
+    SEMICOLON  shift, and go to state 45
+
+
+state 33
+
+   54 type: ARRAY LBRACKET . constant DOTDOT constant RBRACKET OF type
+
+    NUMBER  shift, and go to state 46
+    PLUS    shift, and go to state 47
+    MINUS   shift, and go to state 48
+
+    constant  go to state 49
+
+
+state 34
+
+   55 type: RECORD field_list . END
+
+    END  shift, and go to state 50
+
+
+state 35
+
+   58 field_list: field_list_section .
+   59 field_list_section: field_list_section . SEMICOLON identifier_list COLON type
+
+    SEMICOLON  shift, and go to state 51
+
+    $default  reduce using rule 58 (field_list)
+
+
+state 36
+
+   60 field_list_section: identifier_list . COLON type
+  100 identifier_list: identifier_list . COMMA ID
+
+    COMMA  shift, and go to state 26
+    COLON  shift, and go to state 52
+
+
+state 37
+
+    9 variable_declaration_list: variable_declaration_list identifier_list COLON . type SEMICOLON
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 53
+
+
+state 38
+
+  100 identifier_list: identifier_list COMMA ID .
+
+    $default  reduce using rule 100 (identifier_list)
+
+
+state 39
+
+   10 variable_declaration_list: identifier_list COLON type . SEMICOLON
+
+    SEMICOLON  shift, and go to state 54
+
+
+state 40
+
+   20 function_declaration: FUNCTION ID . $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body
+
+    $default  reduce using rule 18 ($@4)
+
+    $@4  go to state 55
+
+
+state 41
+
+   17 procedure_declaration: PROCEDURE ID . $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON $@3 declaration_body
+
+    $default  reduce using rule 15 ($@2)
+
+    $@2  go to state 56
+
+
+state 42
+
+   29 compound_statement: PBEGIN . statement_sequence END
+
+    PBEGIN  shift, and go to state 42
+    FOR     shift, and go to state 57
+    IF      shift, and go to state 58
+    WHILE   shift, and go to state 59
+    ID      shift, and go to state 60
+
+    $default  reduce using rule 37 (closed_statement)
+
+    compound_statement      go to state 61
+    statement_sequence      go to state 62
+    statement               go to state 63
+    open_statement          go to state 64
+    closed_statement        go to state 65
+    open_if_statement       go to state 66
+    closed_if_statement     go to state 67
+    open_while_statement    go to state 68
+    closed_while_statement  go to state 69
+    open_for_statement      go to state 70
+    closed_for_statement    go to state 71
+    assignment_statement    go to state 72
+    procedure_statement     go to state 73
+    variable                go to state 74
+
+
+state 43
+
+    2 program: PROGRAM ID SEMICOLON type_definitions variable_declarations $@1 subprogram_declarations compound_statement . DOT
+
+    DOT  shift, and go to state 75
+
+
+state 44
+
+   12 subprogram_declarations: procedure_declaration SEMICOLON . subprogram_declarations
+
+    FUNCTION   shift, and go to state 28
+    PROCEDURE  shift, and go to state 29
+
+    $default  reduce using rule 11 (subprogram_declarations)
+
+    subprogram_declarations  go to state 76
+    procedure_declaration    go to state 31
+    function_declaration     go to state 32
+
+
+state 45
+
+   13 subprogram_declarations: function_declaration SEMICOLON . subprogram_declarations
+
+    FUNCTION   shift, and go to state 28
+    PROCEDURE  shift, and go to state 29
+
+    $default  reduce using rule 11 (subprogram_declarations)
+
+    subprogram_declarations  go to state 77
+    procedure_declaration    go to state 31
+    function_declaration     go to state 32
+
+
+state 46
+
+   61 constant: NUMBER .
+
+    $default  reduce using rule 61 (constant)
+
+
+state 47
+
+   62 constant: PLUS . NUMBER
+
+    NUMBER  shift, and go to state 78
+
+
+state 48
+
+   63 constant: MINUS . NUMBER
+
+    NUMBER  shift, and go to state 79
+
+
+state 49
+
+   54 type: ARRAY LBRACKET constant . DOTDOT constant RBRACKET OF type
+
+    DOTDOT  shift, and go to state 80
+
+
+state 50
+
+   55 type: RECORD field_list END .
+
+    $default  reduce using rule 55 (type)
+
+
+state 51
+
+   59 field_list_section: field_list_section SEMICOLON . identifier_list COLON type
+
+    ID  shift, and go to state 16
+
+    identifier_list  go to state 81
+
+
+state 52
+
+   60 field_list_section: identifier_list COLON . type
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 82
+
+
+state 53
+
+    9 variable_declaration_list: variable_declaration_list identifier_list COLON type . SEMICOLON
+
+    SEMICOLON  shift, and go to state 83
+
+
+state 54
+
+   10 variable_declaration_list: identifier_list COLON type SEMICOLON .
+
+    $default  reduce using rule 10 (variable_declaration_list)
+
+
+state 55
+
+   20 function_declaration: FUNCTION ID $@4 . LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body
+
+    LPARENTHESIS  shift, and go to state 84
+
+
+state 56
+
+   17 procedure_declaration: PROCEDURE ID $@2 . LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON $@3 declaration_body
+
+    LPARENTHESIS  shift, and go to state 85
+
+
+state 57
+
+   49 open_for_statement: FOR . ID ASSIGNOP expression TO expression DO open_statement
+   50 closed_for_statement: FOR . ID ASSIGNOP expression TO expression DO closed_statement
+
+    ID  shift, and go to state 86
+
+
+state 58
+
+   44 open_if_statement: IF . expression THEN statement
+   45                  | IF . expression THEN closed_statement ELSE open_statement
+   46 closed_if_statement: IF . expression THEN closed_statement ELSE closed_statement
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 94
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 59
+
+   47 open_while_statement: WHILE . expression DO open_statement
+   48 closed_while_statement: WHILE . expression DO closed_statement
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 101
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 60
+
+   52 procedure_statement: ID . LPARENTHESIS actual_parameter_list RPARENTHESIS
+   91 variable: ID . component_selection
+
+    LPARENTHESIS  shift, and go to state 102
+    LBRACKET      shift, and go to state 103
+    DOT           shift, and go to state 104
+
+    $default  reduce using rule 92 (component_selection)
+
+    component_selection  go to state 105
+
+
+state 61
+
+   40 closed_statement: compound_statement .
+
+    $default  reduce using rule 40 (closed_statement)
+
+
+state 62
+
+   29 compound_statement: PBEGIN statement_sequence . END
+   30 statement_sequence: statement_sequence . SEMICOLON statement
+
+    END        shift, and go to state 106
+    SEMICOLON  shift, and go to state 107
+
+
+state 63
+
+   31 statement_sequence: statement .
+
+    $default  reduce using rule 31 (statement_sequence)
+
+
+state 64
+
+   32 statement: open_statement .
+
+    $default  reduce using rule 32 (statement)
+
+
+state 65
+
+   33 statement: closed_statement .
+
+    $default  reduce using rule 33 (statement)
+
+
+state 66
+
+   34 open_statement: open_if_statement .
+
+    $default  reduce using rule 34 (open_statement)
+
+
+state 67
+
+   41 closed_statement: closed_if_statement .
+
+    $default  reduce using rule 41 (closed_statement)
+
+
+state 68
+
+   35 open_statement: open_while_statement .
+
+    $default  reduce using rule 35 (open_statement)
+
+
+state 69
+
+   42 closed_statement: closed_while_statement .
+
+    $default  reduce using rule 42 (closed_statement)
+
+
+state 70
+
+   36 open_statement: open_for_statement .
+
+    $default  reduce using rule 36 (open_statement)
+
+
+state 71
+
+   43 closed_statement: closed_for_statement .
+
+    $default  reduce using rule 43 (closed_statement)
+
+
+state 72
+
+   38 closed_statement: assignment_statement .
+
+    $default  reduce using rule 38 (closed_statement)
+
+
+state 73
+
+   39 closed_statement: procedure_statement .
+
+    $default  reduce using rule 39 (closed_statement)
+
+
+state 74
+
+   51 assignment_statement: variable . ASSIGNOP expression
+
+    ASSIGNOP  shift, and go to state 108
+
+
+state 75
+
+    2 program: PROGRAM ID SEMICOLON type_definitions variable_declarations $@1 subprogram_declarations compound_statement DOT .
+
+    $default  reduce using rule 2 (program)
+
+
+state 76
+
+   12 subprogram_declarations: procedure_declaration SEMICOLON subprogram_declarations .
+
+    $default  reduce using rule 12 (subprogram_declarations)
+
+
+state 77
+
+   13 subprogram_declarations: function_declaration SEMICOLON subprogram_declarations .
+
+    $default  reduce using rule 13 (subprogram_declarations)
+
+
+state 78
+
+   62 constant: PLUS NUMBER .
+
+    $default  reduce using rule 62 (constant)
+
+
+state 79
+
+   63 constant: MINUS NUMBER .
+
+    $default  reduce using rule 63 (constant)
+
+
+state 80
+
+   54 type: ARRAY LBRACKET constant DOTDOT . constant RBRACKET OF type
+
+    NUMBER  shift, and go to state 46
+    PLUS    shift, and go to state 47
+    MINUS   shift, and go to state 48
+
+    constant  go to state 109
+
+
+state 81
+
+   59 field_list_section: field_list_section SEMICOLON identifier_list . COLON type
+  100 identifier_list: identifier_list . COMMA ID
+
+    COMMA  shift, and go to state 26
+    COLON  shift, and go to state 110
+
+
+state 82
+
+   60 field_list_section: identifier_list COLON type .
+
+    $default  reduce using rule 60 (field_list_section)
+
+
+state 83
+
+    9 variable_declaration_list: variable_declaration_list identifier_list COLON type SEMICOLON .
+
+    $default  reduce using rule 9 (variable_declaration_list)
+
+
+state 84
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS . formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body
+
+    ID  shift, and go to state 16
+
+    $default  reduce using rule 23 (formal_parameter_list)
+
+    formal_parameter_list          go to state 111
+    formal_parameter_list_section  go to state 112
+    identifier_list                go to state 113
+
+
+state 85
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS . formal_parameter_list RPARENTHESIS SEMICOLON $@3 declaration_body
+
+    ID  shift, and go to state 16
+
+    $default  reduce using rule 23 (formal_parameter_list)
+
+    formal_parameter_list          go to state 114
+    formal_parameter_list_section  go to state 112
+    identifier_list                go to state 113
+
+
+state 86
+
+   49 open_for_statement: FOR ID . ASSIGNOP expression TO expression DO open_statement
+   50 closed_for_statement: FOR ID . ASSIGNOP expression TO expression DO closed_statement
+
+    ASSIGNOP  shift, and go to state 115
+
+
+state 87
+
+   88 factor: NOT . factor
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    factor              go to state 116
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 88
+
+   84 factor: NUMBER .
+
+    $default  reduce using rule 84 (factor)
+
+
+state 89
+
+   85 factor: STRING .
+
+    $default  reduce using rule 85 (factor)
+
+
+state 90
+
+   90 function_reference: ID . LPARENTHESIS actual_parameter_list RPARENTHESIS
+   91 variable: ID . component_selection
+
+    LPARENTHESIS  shift, and go to state 117
+    LBRACKET      shift, and go to state 103
+    DOT           shift, and go to state 104
+
+    $default  reduce using rule 92 (component_selection)
+
+    component_selection  go to state 105
+
+
+state 91
+
+   72 simple_expression: PLUS . simple_expression_list
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression_list  go to state 118
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 92
+
+   73 simple_expression: MINUS . simple_expression_list
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression_list  go to state 119
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 93
+
+   89 factor: LPARENTHESIS . expression RPARENTHESIS
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 120
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 94
+
+   44 open_if_statement: IF expression . THEN statement
+   45                  | IF expression . THEN closed_statement ELSE open_statement
+   46 closed_if_statement: IF expression . THEN closed_statement ELSE closed_statement
+
+    THEN  shift, and go to state 121
+
+
+state 95
+
+   64 expression: simple_expression .
+   65           | simple_expression . LT simple_expression
+   66           | simple_expression . LE simple_expression
+   67           | simple_expression . EQ simple_expression
+   68           | simple_expression . GE simple_expression
+   69           | simple_expression . GT simple_expression
+   70           | simple_expression . NE simple_expression
+
+    LT  shift, and go to state 122
+    EQ  shift, and go to state 123
+    GT  shift, and go to state 124
+    LE  shift, and go to state 125
+    GE  shift, and go to state 126
+    NE  shift, and go to state 127
+
+    $default  reduce using rule 64 (expression)
+
+
+state 96
+
+   71 simple_expression: simple_expression_list .
+   75 simple_expression_list: simple_expression_list . PLUS term
+   76                       | simple_expression_list . MINUS term
+   77                       | simple_expression_list . OR term
+
+    OR     shift, and go to state 128
+    PLUS   shift, and go to state 129
+    MINUS  shift, and go to state 130
+
+    $default  reduce using rule 71 (simple_expression)
+
+
+state 97
+
+   74 simple_expression_list: term .
+   79 term: term . MULTI factor
+   80     | term . DIV factor
+   81     | term . DIVIS factor
+   82     | term . MOD factor
+   83     | term . AND factor
+
+    AND    shift, and go to state 131
+    DIV    shift, and go to state 132
+    MOD    shift, and go to state 133
+    MULTI  shift, and go to state 134
+    DIVIS  shift, and go to state 135
+
+    $default  reduce using rule 74 (simple_expression_list)
+
+
+state 98
+
+   78 term: factor .
+
+    $default  reduce using rule 78 (term)
+
+
+state 99
+
+   87 factor: function_reference .
+
+    $default  reduce using rule 87 (factor)
+
+
+state 100
+
+   86 factor: variable .
+
+    $default  reduce using rule 86 (factor)
+
+
+state 101
+
+   47 open_while_statement: WHILE expression . DO open_statement
+   48 closed_while_statement: WHILE expression . DO closed_statement
+
+    DO  shift, and go to state 136
+
+
+state 102
+
+   52 procedure_statement: ID LPARENTHESIS . actual_parameter_list RPARENTHESIS
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    $default  reduce using rule 96 (actual_parameter_list)
+
+    expression                     go to state 137
+    simple_expression              go to state 95
+    simple_expression_list         go to state 96
+    term                           go to state 97
+    factor                         go to state 98
+    function_reference             go to state 99
+    variable                       go to state 100
+    actual_parameter_list          go to state 138
+    actual_parameter_list_section  go to state 139
+
+
+state 103
+
+   95 component_selection: LBRACKET . expression RBRACKET $@7 component_selection
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 140
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 104
+
+   93 component_selection: DOT . ID component_selection
+
+    ID  shift, and go to state 141
+
+
+state 105
+
+   91 variable: ID component_selection .
+
+    $default  reduce using rule 91 (variable)
+
+
+state 106
+
+   29 compound_statement: PBEGIN statement_sequence END .
+
+    $default  reduce using rule 29 (compound_statement)
+
+
+state 107
+
+   30 statement_sequence: statement_sequence SEMICOLON . statement
+
+    PBEGIN  shift, and go to state 42
+    FOR     shift, and go to state 57
+    IF      shift, and go to state 58
+    WHILE   shift, and go to state 59
+    ID      shift, and go to state 60
+
+    $default  reduce using rule 37 (closed_statement)
+
+    compound_statement      go to state 61
+    statement               go to state 142
+    open_statement          go to state 64
+    closed_statement        go to state 65
+    open_if_statement       go to state 66
+    closed_if_statement     go to state 67
+    open_while_statement    go to state 68
+    closed_while_statement  go to state 69
+    open_for_statement      go to state 70
+    closed_for_statement    go to state 71
+    assignment_statement    go to state 72
+    procedure_statement     go to state 73
+    variable                go to state 74
+
+
+state 108
+
+   51 assignment_statement: variable ASSIGNOP . expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 143
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 109
+
+   54 type: ARRAY LBRACKET constant DOTDOT constant . RBRACKET OF type
+
+    RBRACKET  shift, and go to state 144
+
+
+state 110
+
+   59 field_list_section: field_list_section SEMICOLON identifier_list COLON . type
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 145
+
+
+state 111
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list . RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body
+
+    RPARENTHESIS  shift, and go to state 146
+
+
+state 112
+
+   24 formal_parameter_list: formal_parameter_list_section .
+   25 formal_parameter_list_section: formal_parameter_list_section . SEMICOLON identifier_list COLON type
+
+    SEMICOLON  shift, and go to state 147
+
+    $default  reduce using rule 24 (formal_parameter_list)
+
+
+state 113
+
+   26 formal_parameter_list_section: identifier_list . COLON type
+  100 identifier_list: identifier_list . COMMA ID
+
+    COMMA  shift, and go to state 26
+    COLON  shift, and go to state 148
+
+
+state 114
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS formal_parameter_list . RPARENTHESIS SEMICOLON $@3 declaration_body
+
+    RPARENTHESIS  shift, and go to state 149
+
+
+state 115
+
+   49 open_for_statement: FOR ID ASSIGNOP . expression TO expression DO open_statement
+   50 closed_for_statement: FOR ID ASSIGNOP . expression TO expression DO closed_statement
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 150
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 116
+
+   88 factor: NOT factor .
+
+    $default  reduce using rule 88 (factor)
+
+
+state 117
+
+   90 function_reference: ID LPARENTHESIS . actual_parameter_list RPARENTHESIS
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    $default  reduce using rule 96 (actual_parameter_list)
+
+    expression                     go to state 137
+    simple_expression              go to state 95
+    simple_expression_list         go to state 96
+    term                           go to state 97
+    factor                         go to state 98
+    function_reference             go to state 99
+    variable                       go to state 100
+    actual_parameter_list          go to state 151
+    actual_parameter_list_section  go to state 139
+
+
+state 118
+
+   72 simple_expression: PLUS simple_expression_list .
+   75 simple_expression_list: simple_expression_list . PLUS term
+   76                       | simple_expression_list . MINUS term
+   77                       | simple_expression_list . OR term
+
+    OR     shift, and go to state 128
+    PLUS   shift, and go to state 129
+    MINUS  shift, and go to state 130
+
+    $default  reduce using rule 72 (simple_expression)
+
+
+state 119
+
+   73 simple_expression: MINUS simple_expression_list .
+   75 simple_expression_list: simple_expression_list . PLUS term
+   76                       | simple_expression_list . MINUS term
+   77                       | simple_expression_list . OR term
+
+    OR     shift, and go to state 128
+    PLUS   shift, and go to state 129
+    MINUS  shift, and go to state 130
+
+    $default  reduce using rule 73 (simple_expression)
+
+
+state 120
+
+   89 factor: LPARENTHESIS expression . RPARENTHESIS
+
+    RPARENTHESIS  shift, and go to state 152
+
+
+state 121
+
+   44 open_if_statement: IF expression THEN . statement
+   45                  | IF expression THEN . closed_statement ELSE open_statement
+   46 closed_if_statement: IF expression THEN . closed_statement ELSE closed_statement
+
+    PBEGIN  shift, and go to state 42
+    FOR     shift, and go to state 57
+    IF      shift, and go to state 58
+    WHILE   shift, and go to state 59
+    ID      shift, and go to state 60
+
+    $default  reduce using rule 37 (closed_statement)
+
+    compound_statement      go to state 61
+    statement               go to state 153
+    open_statement          go to state 64
+    closed_statement        go to state 154
+    open_if_statement       go to state 66
+    closed_if_statement     go to state 67
+    open_while_statement    go to state 68
+    closed_while_statement  go to state 69
+    open_for_statement      go to state 70
+    closed_for_statement    go to state 71
+    assignment_statement    go to state 72
+    procedure_statement     go to state 73
+    variable                go to state 74
+
+
+state 122
+
+   65 expression: simple_expression LT . simple_expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression       go to state 155
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 123
+
+   67 expression: simple_expression EQ . simple_expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression       go to state 156
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 124
+
+   69 expression: simple_expression GT . simple_expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression       go to state 157
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 125
+
+   66 expression: simple_expression LE . simple_expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression       go to state 158
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 126
+
+   68 expression: simple_expression GE . simple_expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression       go to state 159
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 127
+
+   70 expression: simple_expression NE . simple_expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    simple_expression       go to state 160
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 128
+
+   77 simple_expression_list: simple_expression_list OR . term
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    term                go to state 161
+    factor              go to state 98
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 129
+
+   75 simple_expression_list: simple_expression_list PLUS . term
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    term                go to state 162
+    factor              go to state 98
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 130
+
+   76 simple_expression_list: simple_expression_list MINUS . term
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    term                go to state 163
+    factor              go to state 98
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 131
+
+   83 term: term AND . factor
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    factor              go to state 164
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 132
+
+   80 term: term DIV . factor
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    factor              go to state 165
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 133
+
+   82 term: term MOD . factor
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    factor              go to state 166
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 134
+
+   79 term: term MULTI . factor
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    factor              go to state 167
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 135
+
+   81 term: term DIVIS . factor
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    LPARENTHESIS  shift, and go to state 93
+
+    factor              go to state 168
+    function_reference  go to state 99
+    variable            go to state 100
+
+
+state 136
+
+   47 open_while_statement: WHILE expression DO . open_statement
+   48 closed_while_statement: WHILE expression DO . closed_statement
+
+    PBEGIN  shift, and go to state 42
+    FOR     shift, and go to state 57
+    IF      shift, and go to state 58
+    WHILE   shift, and go to state 59
+    ID      shift, and go to state 60
+
+    $default  reduce using rule 37 (closed_statement)
+
+    compound_statement      go to state 61
+    open_statement          go to state 169
+    closed_statement        go to state 170
+    open_if_statement       go to state 66
+    closed_if_statement     go to state 67
+    open_while_statement    go to state 68
+    closed_while_statement  go to state 69
+    open_for_statement      go to state 70
+    closed_for_statement    go to state 71
+    assignment_statement    go to state 72
+    procedure_statement     go to state 73
+    variable                go to state 74
+
+
+state 137
+
+   99 actual_parameter_list_section: expression .
+
+    $default  reduce using rule 99 (actual_parameter_list_section)
+
+
+state 138
+
+   52 procedure_statement: ID LPARENTHESIS actual_parameter_list . RPARENTHESIS
+
+    RPARENTHESIS  shift, and go to state 171
+
+
+state 139
+
+   97 actual_parameter_list: actual_parameter_list_section .
+   98 actual_parameter_list_section: actual_parameter_list_section . COMMA expression
+
+    COMMA  shift, and go to state 172
+
+    $default  reduce using rule 97 (actual_parameter_list)
+
+
+state 140
+
+   95 component_selection: LBRACKET expression . RBRACKET $@7 component_selection
+
+    RBRACKET  shift, and go to state 173
+
+
+state 141
+
+   93 component_selection: DOT ID . component_selection
+
+    LBRACKET  shift, and go to state 103
+    DOT       shift, and go to state 104
+
+    $default  reduce using rule 92 (component_selection)
+
+    component_selection  go to state 174
+
+
+state 142
+
+   30 statement_sequence: statement_sequence SEMICOLON statement .
+
+    $default  reduce using rule 30 (statement_sequence)
+
+
+state 143
+
+   51 assignment_statement: variable ASSIGNOP expression .
+
+    $default  reduce using rule 51 (assignment_statement)
+
+
+state 144
+
+   54 type: ARRAY LBRACKET constant DOTDOT constant RBRACKET . OF type
+
+    OF  shift, and go to state 175
+
+
+state 145
+
+   59 field_list_section: field_list_section SEMICOLON identifier_list COLON type .
+
+    $default  reduce using rule 59 (field_list_section)
+
+
+state 146
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS . COLON result_type SEMICOLON $@5 declaration_body
+
+    COLON  shift, and go to state 176
+
+
+state 147
+
+   25 formal_parameter_list_section: formal_parameter_list_section SEMICOLON . identifier_list COLON type
+
+    ID  shift, and go to state 16
+
+    identifier_list  go to state 177
+
+
+state 148
+
+   26 formal_parameter_list_section: identifier_list COLON . type
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 178
+
+
+state 149
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS . SEMICOLON $@3 declaration_body
+
+    SEMICOLON  shift, and go to state 179
+
+
+state 150
+
+   49 open_for_statement: FOR ID ASSIGNOP expression . TO expression DO open_statement
+   50 closed_for_statement: FOR ID ASSIGNOP expression . TO expression DO closed_statement
+
+    TO  shift, and go to state 180
+
+
+state 151
+
+   90 function_reference: ID LPARENTHESIS actual_parameter_list . RPARENTHESIS
+
+    RPARENTHESIS  shift, and go to state 181
+
+
+state 152
+
+   89 factor: LPARENTHESIS expression RPARENTHESIS .
+
+    $default  reduce using rule 89 (factor)
+
+
+state 153
+
+   44 open_if_statement: IF expression THEN statement .
+
+    $default  reduce using rule 44 (open_if_statement)
+
+
+state 154
+
+   33 statement: closed_statement .
+   45 open_if_statement: IF expression THEN closed_statement . ELSE open_statement
+   46 closed_if_statement: IF expression THEN closed_statement . ELSE closed_statement
+
+    ELSE  shift, and go to state 182
+
+    $default  reduce using rule 33 (statement)
+
+
+state 155
+
+   65 expression: simple_expression LT simple_expression .
+
+    $default  reduce using rule 65 (expression)
+
+
+state 156
+
+   67 expression: simple_expression EQ simple_expression .
+
+    $default  reduce using rule 67 (expression)
+
+
+state 157
+
+   69 expression: simple_expression GT simple_expression .
+
+    $default  reduce using rule 69 (expression)
+
+
+state 158
+
+   66 expression: simple_expression LE simple_expression .
+
+    $default  reduce using rule 66 (expression)
+
+
+state 159
+
+   68 expression: simple_expression GE simple_expression .
+
+    $default  reduce using rule 68 (expression)
+
+
+state 160
+
+   70 expression: simple_expression NE simple_expression .
+
+    $default  reduce using rule 70 (expression)
+
+
+state 161
+
+   77 simple_expression_list: simple_expression_list OR term .
+   79 term: term . MULTI factor
+   80     | term . DIV factor
+   81     | term . DIVIS factor
+   82     | term . MOD factor
+   83     | term . AND factor
+
+    AND    shift, and go to state 131
+    DIV    shift, and go to state 132
+    MOD    shift, and go to state 133
+    MULTI  shift, and go to state 134
+    DIVIS  shift, and go to state 135
+
+    $default  reduce using rule 77 (simple_expression_list)
+
+
+state 162
+
+   75 simple_expression_list: simple_expression_list PLUS term .
+   79 term: term . MULTI factor
+   80     | term . DIV factor
+   81     | term . DIVIS factor
+   82     | term . MOD factor
+   83     | term . AND factor
+
+    AND    shift, and go to state 131
+    DIV    shift, and go to state 132
+    MOD    shift, and go to state 133
+    MULTI  shift, and go to state 134
+    DIVIS  shift, and go to state 135
+
+    $default  reduce using rule 75 (simple_expression_list)
+
+
+state 163
+
+   76 simple_expression_list: simple_expression_list MINUS term .
+   79 term: term . MULTI factor
+   80     | term . DIV factor
+   81     | term . DIVIS factor
+   82     | term . MOD factor
+   83     | term . AND factor
+
+    AND    shift, and go to state 131
+    DIV    shift, and go to state 132
+    MOD    shift, and go to state 133
+    MULTI  shift, and go to state 134
+    DIVIS  shift, and go to state 135
+
+    $default  reduce using rule 76 (simple_expression_list)
+
+
+state 164
+
+   83 term: term AND factor .
+
+    $default  reduce using rule 83 (term)
+
+
+state 165
+
+   80 term: term DIV factor .
+
+    $default  reduce using rule 80 (term)
+
+
+state 166
+
+   82 term: term MOD factor .
+
+    $default  reduce using rule 82 (term)
+
+
+state 167
+
+   79 term: term MULTI factor .
+
+    $default  reduce using rule 79 (term)
+
+
+state 168
+
+   81 term: term DIVIS factor .
+
+    $default  reduce using rule 81 (term)
+
+
+state 169
+
+   47 open_while_statement: WHILE expression DO open_statement .
+
+    $default  reduce using rule 47 (open_while_statement)
+
+
+state 170
+
+   48 closed_while_statement: WHILE expression DO closed_statement .
+
+    $default  reduce using rule 48 (closed_while_statement)
+
+
+state 171
+
+   52 procedure_statement: ID LPARENTHESIS actual_parameter_list RPARENTHESIS .
+
+    $default  reduce using rule 52 (procedure_statement)
+
+
+state 172
+
+   98 actual_parameter_list_section: actual_parameter_list_section COMMA . expression
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 183
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 173
+
+   95 component_selection: LBRACKET expression RBRACKET . $@7 component_selection
+
+    $default  reduce using rule 94 ($@7)
+
+    $@7  go to state 184
+
+
+state 174
+
+   93 component_selection: DOT ID component_selection .
+
+    $default  reduce using rule 93 (component_selection)
+
+
+state 175
+
+   54 type: ARRAY LBRACKET constant DOTDOT constant RBRACKET OF . type
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 185
+
+
+state 176
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON . result_type SEMICOLON $@5 declaration_body
+
+    ID  shift, and go to state 186
+
+    result_type  go to state 187
+
+
+state 177
+
+   25 formal_parameter_list_section: formal_parameter_list_section SEMICOLON identifier_list . COLON type
+  100 identifier_list: identifier_list . COMMA ID
+
+    COMMA  shift, and go to state 26
+    COLON  shift, and go to state 188
+
+
+state 178
+
+   26 formal_parameter_list_section: identifier_list COLON type .
+
+    $default  reduce using rule 26 (formal_parameter_list_section)
+
+
+state 179
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON . $@3 declaration_body
+
+    $default  reduce using rule 16 ($@3)
+
+    $@3  go to state 189
+
+
+state 180
+
+   49 open_for_statement: FOR ID ASSIGNOP expression TO . expression DO open_statement
+   50 closed_for_statement: FOR ID ASSIGNOP expression TO . expression DO closed_statement
+
+    NOT           shift, and go to state 87
+    NUMBER        shift, and go to state 88
+    STRING        shift, and go to state 89
+    ID            shift, and go to state 90
+    PLUS          shift, and go to state 91
+    MINUS         shift, and go to state 92
+    LPARENTHESIS  shift, and go to state 93
+
+    expression              go to state 190
+    simple_expression       go to state 95
+    simple_expression_list  go to state 96
+    term                    go to state 97
+    factor                  go to state 98
+    function_reference      go to state 99
+    variable                go to state 100
+
+
+state 181
+
+   90 function_reference: ID LPARENTHESIS actual_parameter_list RPARENTHESIS .
+
+    $default  reduce using rule 90 (function_reference)
+
+
+state 182
+
+   45 open_if_statement: IF expression THEN closed_statement ELSE . open_statement
+   46 closed_if_statement: IF expression THEN closed_statement ELSE . closed_statement
+
+    PBEGIN  shift, and go to state 42
+    FOR     shift, and go to state 57
+    IF      shift, and go to state 58
+    WHILE   shift, and go to state 59
+    ID      shift, and go to state 60
+
+    $default  reduce using rule 37 (closed_statement)
+
+    compound_statement      go to state 61
+    open_statement          go to state 191
+    closed_statement        go to state 192
+    open_if_statement       go to state 66
+    closed_if_statement     go to state 67
+    open_while_statement    go to state 68
+    closed_while_statement  go to state 69
+    open_for_statement      go to state 70
+    closed_for_statement    go to state 71
+    assignment_statement    go to state 72
+    procedure_statement     go to state 73
+    variable                go to state 74
+
+
+state 183
+
+   98 actual_parameter_list_section: actual_parameter_list_section COMMA expression .
+
+    $default  reduce using rule 98 (actual_parameter_list_section)
+
+
+state 184
+
+   95 component_selection: LBRACKET expression RBRACKET $@7 . component_selection
+
+    LBRACKET  shift, and go to state 103
+    DOT       shift, and go to state 104
+
+    $default  reduce using rule 92 (component_selection)
+
+    component_selection  go to state 193
+
+
+state 185
+
+   54 type: ARRAY LBRACKET constant DOTDOT constant RBRACKET OF type .
+
+    $default  reduce using rule 54 (type)
+
+
+state 186
+
+   56 result_type: ID .
+
+    $default  reduce using rule 56 (result_type)
+
+
+state 187
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type . SEMICOLON $@5 declaration_body
+
+    SEMICOLON  shift, and go to state 194
+
+
+state 188
+
+   25 formal_parameter_list_section: formal_parameter_list_section SEMICOLON identifier_list COLON . type
+
+    ARRAY   shift, and go to state 20
+    RECORD  shift, and go to state 21
+    ID      shift, and go to state 22
+
+    type  go to state 195
+
+
+state 189
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON $@3 . declaration_body
+
+    FORWARD  shift, and go to state 196
+    VAR      shift, and go to state 11
+
+    $default  reduce using rule 7 (variable_declarations)
+
+    variable_declarations  go to state 197
+    declaration_body       go to state 198
+    block                  go to state 199
+
+
+state 190
+
+   49 open_for_statement: FOR ID ASSIGNOP expression TO expression . DO open_statement
+   50 closed_for_statement: FOR ID ASSIGNOP expression TO expression . DO closed_statement
+
+    DO  shift, and go to state 200
+
+
+state 191
+
+   45 open_if_statement: IF expression THEN closed_statement ELSE open_statement .
+
+    $default  reduce using rule 45 (open_if_statement)
+
+
+state 192
+
+   46 closed_if_statement: IF expression THEN closed_statement ELSE closed_statement .
+
+    $default  reduce using rule 46 (closed_if_statement)
+
+
+state 193
+
+   95 component_selection: LBRACKET expression RBRACKET $@7 component_selection .
+
+    $default  reduce using rule 95 (component_selection)
+
+
+state 194
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON . $@5 declaration_body
+
+    $default  reduce using rule 19 ($@5)
+
+    $@5  go to state 201
+
+
+state 195
+
+   25 formal_parameter_list_section: formal_parameter_list_section SEMICOLON identifier_list COLON type .
+
+    $default  reduce using rule 25 (formal_parameter_list_section)
+
+
+state 196
+
+   22 declaration_body: FORWARD .
+
+    $default  reduce using rule 22 (declaration_body)
+
+
+state 197
+
+   28 block: variable_declarations . $@6 compound_statement
+
+    $default  reduce using rule 27 ($@6)
+
+    $@6  go to state 202
+
+
+state 198
+
+   17 procedure_declaration: PROCEDURE ID $@2 LPARENTHESIS formal_parameter_list RPARENTHESIS SEMICOLON $@3 declaration_body .
+
+    $default  reduce using rule 17 (procedure_declaration)
+
+
+state 199
+
+   21 declaration_body: block .
+
+    $default  reduce using rule 21 (declaration_body)
+
+
+state 200
+
+   49 open_for_statement: FOR ID ASSIGNOP expression TO expression DO . open_statement
+   50 closed_for_statement: FOR ID ASSIGNOP expression TO expression DO . closed_statement
+
+    PBEGIN  shift, and go to state 42
+    FOR     shift, and go to state 57
+    IF      shift, and go to state 58
+    WHILE   shift, and go to state 59
+    ID      shift, and go to state 60
+
+    $default  reduce using rule 37 (closed_statement)
+
+    compound_statement      go to state 61
+    open_statement          go to state 203
+    closed_statement        go to state 204
+    open_if_statement       go to state 66
+    closed_if_statement     go to state 67
+    open_while_statement    go to state 68
+    closed_while_statement  go to state 69
+    open_for_statement      go to state 70
+    closed_for_statement    go to state 71
+    assignment_statement    go to state 72
+    procedure_statement     go to state 73
+    variable                go to state 74
+
+
+state 201
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 . declaration_body
+
+    FORWARD  shift, and go to state 196
+    VAR      shift, and go to state 11
+
+    $default  reduce using rule 7 (variable_declarations)
+
+    variable_declarations  go to state 197
+    declaration_body       go to state 205
+    block                  go to state 199
+
+
+state 202
+
+   28 block: variable_declarations $@6 . compound_statement
+
+    PBEGIN  shift, and go to state 42
+
+    compound_statement  go to state 206
+
+
+state 203
+
+   49 open_for_statement: FOR ID ASSIGNOP expression TO expression DO open_statement .
+
+    $default  reduce using rule 49 (open_for_statement)
+
+
+state 204
+
+   50 closed_for_statement: FOR ID ASSIGNOP expression TO expression DO closed_statement .
+
+    $default  reduce using rule 50 (closed_for_statement)
+
+
+state 205
+
+   20 function_declaration: FUNCTION ID $@4 LPARENTHESIS formal_parameter_list RPARENTHESIS COLON result_type SEMICOLON $@5 declaration_body .
+
+    $default  reduce using rule 20 (function_declaration)
+
+
+state 206
+
+   28 block: variable_declarations $@6 compound_statement .
+
+    $default  reduce using rule 28 (block)
